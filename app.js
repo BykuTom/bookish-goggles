@@ -2,12 +2,14 @@ import * as util from "./util.js";
 
 class ToDoList {
   constructor() {
+    this.addToDoForm = document.querySelector("#addToDoForm");
     this.toDosListElement = document.querySelector("#ToDos");
     window.addEventListener("load", this.loadToDos.bind(this));
-    this.toDosListElement.addEventListener(
+    this.addToDoForm.addEventListener("submit", this.addToDo.bind(this));
+    /* this.toDosListElement.addEventListener(
       "click",
       this.handleListClick.bind(this)
-    );
+    ); */
   }
 
   loadToDos() {
@@ -56,33 +58,6 @@ class ToDoList {
       this.toDosListElement.appendChild(toDoItem);
     }
   }
-
-  addToDo(label) {
-    const newTodo = {
-      id: util.returnRandomKey(),
-      label,
-      timestamp: new Date(),
-    };
-
-    const todos = this.getTodosFromStorage();
-    todos.push(newTodo);
-    localStorage.setItem("todos", JSON.stringify(todos));
-    this.renderToDos(todos);
-  }
-
-  deleteToDo(id) {
-    const todos = this.getTodosFromStorage();
-    const index = todos.findIndex((item) => item.id === id);
-    if (index === -1) {
-      return;
-    }
-
-    if (confirm("Are you sure you want to delete this todo?")) {
-      todos.splice(index, 1);
-      localStorage.setItem("todos", JSON.stringify(todos));
-      this.renderToDos(todos);
-    }
-  }
   editToDo(id) {
     const todos = this.getTodosFromStorage();
     const todo = todos.find((item) => item.id === id);
@@ -97,14 +72,38 @@ class ToDoList {
       this.renderToDos(todos);
     }
   }
-  handleListClick(event) {
-    if (event.target.tagName === "BUTTON") {
-      const todoId = event.target.parentElement.id;
-      if (event.target.classList.contains("fa-pen-to-square")) {
-        this.editToDo(todoId);
-      } else if (event.target.classList.contains("fa-trash")) {
-        this.deleteToDo(todoId);
-      }
+
+  deleteToDo(id) {
+    console.log(id);
+    const todos = this.getTodosFromStorage();
+    const index = todos.findIndex((item) => item.id === id);
+    if (index === -1) {
+      return;
+    }
+    if (confirm("Are you sure you want to delete this todo?")) {
+      todos.splice(index, 1);
+      localStorage.setItem("todos", JSON.stringify(todos));
+      this.renderToDos(todos);
+    }
+  }
+
+  addToDo(event) {
+    event.preventDefault();
+    const taskInput = event.target.querySelector("#taskInput");
+    let newTodo;
+    if (label !== "") {
+      newTodo = {
+        id: util.returnRandomKey(),
+        label,
+        timestamp: new Date(),
+      };
+    }
+    if (newTodo) {
+      const todos = this.getTodosFromStorage();
+      todos.push(newTodo);
+      localStorage.setItem("todos", JSON.stringify(todos));
+      this.renderToDos(todos);
+      taskInput.value = "";
     }
   }
 
