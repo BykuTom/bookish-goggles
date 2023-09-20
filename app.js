@@ -86,10 +86,10 @@ class ToDoList {
       this.renderToDos(todos);
     }
   }
-
   addToDo(event) {
     event.preventDefault();
     const taskInput = event.target.querySelector("#taskInput");
+    const label = taskInput.value.trim();
     let newTodo;
     if (label !== "") {
       newTodo = {
