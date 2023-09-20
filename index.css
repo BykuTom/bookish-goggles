@@ -1,0 +1,79 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+*::marker {
+  content: none;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  color: whitesmoke;
+  background: #333;
+  font-size: 16px;
+  font-weight: 300;
+  padding: 1rem;
+}
+section h2,
+section form {
+  margin: auto;
+  width: fit-content;
+}
+section form * {
+  font-size: 1.24rem;
+  padding: 0.32rem;
+  border-radius: 0.5rem;
+}
+section form input {
+  color: whitesmoke;
+  background: #333;
+  border: 0.2rem solid whitesmoke;
+}
+section {
+  margin-bottom: 1rem;
+}
+section form button {
+  background-color: lightskyblue;
+  color: whitesmoke;
+
+  border: none;
+  outline: none;
+}
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+ul li {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: start;
+  gap: 0.64rem;
+}
+ul li span {
+  font-size: 1.5rem;
+  padding: 0.32rem;
+  width: 100%;
+  max-width: 40rem;
+  min-height: 10rem;
+  height: fit-content;
+  border: 0.2rem solid whitesmoke;
+  border-radius: 0.5rem;
+}
+ul li button {
+  width: 3rem;
+  height: 3rem;
+  aspect-ratio: 1/1;
+  background: lightcoral;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  color: whitesmoke;
+  font-size: 1.75rem;
+}

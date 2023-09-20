@@ -1,58 +1,116 @@
-// live todo array that we read for the current list of todos
-let todos = [];
+import * as util from "./util.js";
 
-const addToDoForm = document.querySelector("#addToDoForm");
-
-// when the page loads
-window.addEventListener("load", () => {
-  //   check to see if the user has any todos from a previous session
-  const savedToDos = JSON.parse(localStorage.getItem("todos"));
-  if (savedToDos?.length) {
-    // if the user has todos set todos to the saved ones
-    todos = savedToDos;
-  } else {
-    // if they haven't... create a new save
-    localStorage.setItem("todos", JSON.stringify(todos));
+class ToDoList {
+  constructor() {
+    this.toDosListElement = document.querySelector("#ToDos");
+    window.addEventListener("load", this.loadToDos.bind(this));
+    this.toDosListElement.addEventListener(
+      "click",
+      this.handleListClick.bind(this)
+    );
   }
-  renderToDos();
-});
 
-// Add the todos to the site
-const renderToDos = () => {
-  const toDosListElement = document.querySelector("#ToDos");
+  loadToDos() {
+    const savedToDos = JSON.parse(localStorage.getItem("todos")) || [];
+    this.renderToDos(savedToDos);
+  }
 
-  toDosListElement.innerHTML = null;
-  if (todos.length) {
-    todos.forEach((todo, i) => {
+  renderToDos(todos) {
+    this.toDosListElement.innerHTML = null;
+
+    if (todos.length) {
+      todos.forEach((todo) => {
+        const toDoItem = document.createElement("li");
+        toDoItem.id = todo.id;
+        toDoItem.setAttribute(
+          "time",
+          `${new Date(todo.timestamp).toJSON().slice(0, 16)}`
+        );
+
+        const textElement = document.createElement("span");
+        textElement.textContent = `${todo.label} `;
+        textElement.classList.add("todo-text");
+
+        const editButton = document.createElement("button");
+        const editIcon = document.createElement("i");
+        editIcon.setAttribute("class", "fa-solid fa-pen-to-square");
+        editButton.style.background = "cadetblue";
+        editButton.appendChild(editIcon);
+        editButton.addEventListener("click", () => this.editToDo(todo.id));
+
+        const deleteButton = document.createElement("button");
+        const deleteIcon = document.createElement("i");
+        deleteIcon.setAttribute("class", "fa-solid fa-trash");
+        deleteButton.appendChild(deleteIcon);
+        deleteButton.addEventListener("click", () => this.deleteToDo(todo.id));
+
+        toDoItem.appendChild(textElement);
+        toDoItem.appendChild(editButton);
+        toDoItem.appendChild(deleteButton);
+
+        this.toDosListElement.appendChild(toDoItem);
+      });
+    } else {
       const toDoItem = document.createElement("li");
-
-      toDoItem.textContent = `${todo.label} - ${new Date(
-        todo.timestamp
-      ).toISOString()}`;
-
-      toDosListElement.appendChild(toDoItem);
-    });
-  } else {
-    const toDoItem = document.createElement("li");
-    toDoItem.textContent = "Please add todos above";
-    toDosListElement.appendChild(toDoItem);
+      toDoItem.textContent = "Please add todos above";
+      this.toDosListElement.appendChild(toDoItem);
+    }
   }
 
-  console.log(`To Dos Rendered`, todos);
-};
-
-// add todos to the array when the form is submitted
-addToDoForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const { taskInput } = e.target.children;
-  if (taskInput.value.trim()) {
-    todos.push({
-      label: taskInput.value.trim(),
+  addToDo(label) {
+    const newTodo = {
+      id: util.returnRandomKey(),
+      label,
       timestamp: new Date(),
-    });
-    // update localStorage
+    };
+
+    const todos = this.getTodosFromStorage();
+    todos.push(newTodo);
     localStorage.setItem("todos", JSON.stringify(todos));
-    renderToDos();
+    this.renderToDos(todos);
   }
-});
+
+  deleteToDo(id) {
+    const todos = this.getTodosFromStorage();
+    const index = todos.findIndex((item) => item.id === id);
+    if (index === -1) {
+      return;
+    }
+
+    if (confirm("Are you sure you want to delete this todo?")) {
+      todos.splice(index, 1);
+      localStorage.setItem("todos", JSON.stringify(todos));
+      this.renderToDos(todos);
+    }
+  }
+  editToDo(id) {
+    const todos = this.getTodosFromStorage();
+    const todo = todos.find((item) => item.id === id);
+    if (!todo) {
+      return;
+    }
+
+    const newText = prompt("Edit Todo:", todo.label);
+    if (newText !== null) {
+      todo.label = newText;
+      localStorage.setItem("todos", JSON.stringify(todos));
+      this.renderToDos(todos);
+    }
+  }
+  handleListClick(event) {
+    if (event.target.tagName === "BUTTON") {
+      const todoId = event.target.parentElement.id;
+      if (event.target.classList.contains("fa-pen-to-square")) {
+        this.editToDo(todoId);
+      } else if (event.target.classList.contains("fa-trash")) {
+        this.deleteToDo(todoId);
+      }
+    }
+  }
+
+  getTodosFromStorage() {
+    return JSON.parse(localStorage.getItem("todos")) || [];
+  }
+}
+
+const toDoList = new ToDoList();
